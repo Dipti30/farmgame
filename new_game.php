@@ -1,12 +1,14 @@
 <?php 
 session_start();
+ini_set('error_reporting', E_ALL);
+ini_set("display_errors", 1);
 //New Game start
-if($_GET['param']=="new_game"){
+if(isset($_GET['param']) && ($_GET['param']=="new_game")){
 	new_game();
 }
 
 //If it is not a new game and increase the counter
-if($_GET['param']!="new_game" && isset($_SESSION['feed_count'])){
+if(!isset($_GET['param']) && isset($_SESSION['feed_count'])){
 	$_SESSION['feed_count']=$_SESSION['feed_count']+1;
 }
 
@@ -14,7 +16,7 @@ if($_GET['param']!="new_game" && isset($_SESSION['feed_count'])){
 if($_SESSION['feed_count']==50){
 	$result=result();	
 }else{
-	if($_GET['param']!="new_game"){
+	if(!isset($_GET['param'])){
 		//If not initialized the variables redirect to home page to start a new game
 		if(!isset($_SESSION['feed_count'])){	
 			header("Location: index.php"); exit;
@@ -115,7 +117,7 @@ function result(){
 	//check key for bunny if it exist in array
 	$count_bunny=check_key_exists(array(4,5,6,7),$_SESSION['updated_array']);
 
-	if(count($farmer)==1 || count($count_cow)==2 || count($count_bunny)==4){
+	if(count($count_farmer)==1 || count($count_cow)==2 || count($count_bunny)==4){
 		return 2;
 	}else{
 		return 1;
@@ -144,7 +146,7 @@ function result(){
 						<p class="text-uppercase">
 							<?php 
 							//Display turn counter
-							if(isset($_SESSION['feed_count']) && ($_SESSION['feed_count']!=0)){
+							if(isset($_SESSION['feed_count']) && ($_SESSION['feed_count']!=0) && isset($fed)){
 								echo 'Feed '.$_SESSION['feed_count']. '-'.$fed.' is fed';
 							} 
 							//Display who is fed
@@ -168,15 +170,15 @@ function result(){
 						</h4>
 						<div class="cont-btn">
 							<!--Display feed button if the turn is not 50 and farmer has not died or one farmer, one cow and one bunny not present in final array to win the game-->
-							<?php if((!isset($_SESSION['feed_count']) || $_SESSION['feed_count']!=50) && $_SESSION['removed_key']!=1 && $result!=2){?>
+							<?php if((!isset($_SESSION['feed_count']) || $_SESSION['feed_count']!=50) && ((isset($_SESSION['removed_key']) && $_SESSION['removed_key']!=1) || !isset($_SESSION['removed_key'])) && (isset($result) && $result!=2) || !isset($result)){?>
 								<a class="btn text-uppercase" href="new_game.php">Feed</a>
 							<?php } 
 							$game_over_text='<br/>
 									<a href="new_game.php?param=new_game">Start a New game</a>';
 
-							if($_GET['param']!="new_game"){
+							if(!isset($_GET['param'])){
 								//Based on final result
-								if($result==2){
+								if(isset($result) && $result==2){
 									echo '<h3>You Lose the Game</h3>'.$game_over_text;
 									game_over();
 								}
@@ -188,7 +190,7 @@ function result(){
 									}
 								}
 								//You lose the game if atleast 1 of each is not pending
-								if($_SESSION['removed_key']==1){
+								if(isset($_SESSION['removed_key']) && $_SESSION['removed_key']==1){
 									echo '<h3>Game Over. You Lose the Game.</h3>'.$game_over_text;
 									game_over();
 								}
