@@ -1,7 +1,7 @@
 <?php 
 session_start();
-ini_set('error_reporting', E_ALL);
-ini_set("display_errors", 1);
+ini_set('error_reporting', 0);
+ini_set("display_errors", 0);
 //New Game start
 if(isset($_GET['param']) && ($_GET['param']=="new_game")){
 	new_game();
